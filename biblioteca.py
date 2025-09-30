@@ -1,6 +1,40 @@
+from operator import truediv
+
+import reader from csv
+
+from matplotlib.pyplot import annotate
+
+
 def carica_da_file(file_path):
     """Carica i libri dal file"""
     # TODO
+    try:
+        with open("biblioteca.csv","r") as infile:
+            prima_riga = infile.readline().strip()
+            num_sezioni=int(prima_riga)
+            biblioteca = [[] for _ in range(num_sezioni)]
+            csv_reader= reader(infile)
+            for row in csv_reader:
+            titolo = row[0]
+            autore=row[1]
+            anno=int(row[2])
+            pagine=int(row[3])
+            sezione=int(row[4])
+            libro = {
+                "titolo": titolo,
+                "autore": autore,
+                "anno": anno,
+                "pagine": pagine,
+                "sezione": sezione
+            }
+            biblioteca[sezione-1].append(libro)
+        return biblioteca
+
+    except FileNotFoundError:
+        print("File not found")
+        return None
+
+
 
 
 def aggiungi_libro(biblioteca, titolo, autore, anno, pagine, sezione, file_path):
