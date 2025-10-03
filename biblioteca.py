@@ -1,21 +1,97 @@
+import csv
 def carica_da_file(file_path):
     """Carica i libri dal file"""
     # TODO
+
+    import csv
+
+    dizionario=dict() # dizionario vuoto2
+
+
+    try:
+        with open(file_path) as csvfile:
+            libri= csv.reader(csvfile) # leggo con lo strumento del csv
+            lista=(list(libri)) # aggiungo i libri letti uno per uno in una lista
+
+        for el in range(0,len(lista)):
+            sezione=int(lista[el][-1]) #prende le singole liste contenenti un singolo libro
+                                      # e prende l'ultimo elemento, ovvero la sezione
+
+            if sezione not in dizionario:
+                dizionario[sezione]=[]
+            dizionario[sezione].append(lista[el]) #aggiunge alla lista i singoli libri
+            dizionario= dict(sorted(dizionario.items()))#gli ordina nel dizionario in base alla sezione
+
+    except FileNotFoundError:
+        print(f"Il file digitato non è stato trovato:{file_path},\n riprova")
+
+    return dizionario
 
 
 def aggiungi_libro(biblioteca, titolo, autore, anno, pagine, sezione, file_path):
     """Aggiunge un libro nella biblioteca"""
     # TODO
+    new_book= [] # aggiungo il libro inserito in input
+    new_book.append(titolo)
+    new_book.append(autore)
+    new_book.append(anno)
+    new_book.append(pagine)
+    new_book.append(sezione)
+    if sezione <= max(biblioteca.keys()): #se la sezione esiste
+        trovato= False
+        for keys, list in biblioteca.items(): # itero su chiave valore, il valore è una lista di liste
+            for el in list: # prendo le singole liste dalla lista complessiva
+                if el[0].lower()== new_book[0].lower(): #prende il titolo del nuovo libro
+                                                        # e lo confronto con i titoli presdenti nel dizionario
+                    trovato = True #cambio valore per uscire dal ciclo
+                    break
+
+            if trovato:
+                break
+
+        if trovato:
+            print("il libro è già presente nel data base")
+        else: # se non trova il libro vuol dire che non è presente nel data base
+            biblioteca[sezione].append(new_book)# lo aggiungo al dizionario
+
+            with open(file_path, mode="a", newline="") as csvfile: # modifico il file aggiungendo il new_book
+                #"a" in modalità append, aggiungo. newline="" evita di far mettere in automatico l'acapo
+                AddFile = csv.writer(csvfile)
+                AddFile.writerow(new_book)
+                csvfile.close()
+
+            return new_book,print(f"è stato aggiunto:{new_book}")
+    else:
+        print("non esiste la sezione")
+
 
 
 def cerca_libro(biblioteca, titolo):
     """Cerca un libro nella biblioteca dato il titolo"""
     # TODO
+    trovato= False
+    for  chiave, lista_liste in biblioteca.items(): # itero su chaive valore, di liste di liste
+        for lista in lista_liste: #cerco le singole liste
+            for i in range(len(lista)):
+                if lista[0].lower() == titolo.lower(): #confronto i titoli
+                    # .lower perché così confronto tutto in minuscolo
+                    trovato = True
+                    return lista
+
+    if trovato == False: #se non trovo il libro
+        print("Il libro non è presente nel data base")
+
 
 
 def elenco_libri_sezione_per_titolo(biblioteca, sezione):
     """Ordina i titoli di una data sezione della biblioteca in ordine alfabetico"""
     # TODO
+    if sezione in biblioteca: # se la sezione è nelle chiavi della biblioteca
+        biblioteca[sezione]= sorted(biblioteca[sezione])#ordina la lista in ordine crescente
+        print(f"la sezione {sezione} è stata ordinata, il nuovo ordine è:{biblioteca[sezione]}")
+    else:#se non lo trova
+        print(f"non esiste la sezione {sezione} digitata")
+
 
 
 def main():
