@@ -1,21 +1,74 @@
+import csv
+from libro import Libro
+
 def carica_da_file(file_path):
     """Carica i libri dal file"""
-    # TODO
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            for riga in reader: # oppure uso "for index, riga in enumerate(reader):" e uso index per stabilire quando sto leggendo la prima riga.
+                if len(riga) == 1:
+                    num_sezioni = int(riga[0])  # prima riga: numero sezioni
+                    biblioteca = _crea_biblioteca(num_sezioni)
+                if len(riga) == 5:
+                    titolo, autore, anno, pagine, sezione = riga
+                    libro = Libro(titolo.strip(), autore.strip(), int(anno), int(pagine))
+                    biblioteca[int(sezione) - 1].append(libro)
+    
+        print(f'File "{file_path}" caricato correttamente con {num_sezioni} sezioni!\n')
+        return biblioteca
+    except FileNotFoundError:
+        print(f"Errore: il file {file_path} non esiste.")
+        return None
 
+def _crea_biblioteca(num_sezioni): # Metodo interno creato per inizializzare la biblioteca 
+    return [[] for _ in range(num_sezioni)]
 
 def aggiungi_libro(biblioteca, titolo, autore, anno, pagine, sezione, file_path):
     """Aggiunge un libro nella biblioteca"""
-    # TODO
+    if sezione < 1 or sezione > len(biblioteca):
+        return None
+
+    # non aggiungere se già esiste un libro con stesso titolo
+    if cerca_libro(biblioteca, titolo) is not None:
+        return None
+
+    libro = Libro(titolo, autore, anno, pagine)
+    biblioteca[sezione - 1].append(libro)
+
+    try:
+        with open(file_path, "a", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([libro.titolo, libro.autore, libro.anno, libro.pagine, sezione])
+        print("File aggiornato con i nuovi libri!\n")
+    except FileNotFoundError:
+        # Se il file non viene trovato non può essere aggiornato quindi non è possibile aggiungere il libro --> lo elimino dalla lista
+        biblioteca[sezione - 1].remove(libro)
+        print(f"Errore: impossibile aggiornare il file {file_path} perché non esiste.")
+        return None
+
+    return libro
 
 
 def cerca_libro(biblioteca, titolo):
     """Cerca un libro nella biblioteca dato il titolo"""
-    # TODO
+    for numero_sezione, sezione in enumerate(biblioteca, start=1): # start=1 indica che "numero_sezioni" deve partire da 1 e non da 0.
+        for libro in sezione:
+            if libro.titolo == titolo:
+                return f"{libro.titolo}, {libro.autore}, {libro.anno}, {libro.pagine}, {numero_sezione}"
+    return None
 
 
 def elenco_libri_sezione_per_titolo(biblioteca, sezione):
     """Ordina i titoli di una data sezione della biblioteca in ordine alfabetico"""
-    # TODO
+    if sezione < 1 or sezione > len(biblioteca):
+        print("Sezione non valida.")
+        return None
+
+    # Estrazione solo dei titoli (lista di stringhe)
+    titoli = [libro.titolo for libro in biblioteca[sezione - 1]]
+
+    return sorted(titoli)
 
 
 def main():
@@ -97,4 +150,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
