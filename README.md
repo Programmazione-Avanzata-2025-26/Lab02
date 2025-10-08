@@ -2,7 +2,7 @@
 > **💡 NOTE 💡** 
 > 
 > - La soluzione utilizza la classe `Libro` definita nel file `libro.py`, ma andava bene usare qualsiasi altra struttura dati per modellare il concetto di libro (dizionario, tupla, lista, ecc.)
-> - La struttura dati che rappresenta la biblioteca è implementata come una lista di liste: la lista principale contiene le diverse sezioni della biblioteca, e ciascuna sezione è a sua volta una lista di libri come mostrato nello schema che segue.
+> - La struttura dati che rappresenta la biblioteca è implementata come una lista di liste: la lista principale contiene le diverse sezioni della biblioteca, e ciascuna sezione è, a sua volta, una lista di libri, come mostrato nello schema che segue.
 > <img src="img/biblioteca.png" width="40%">
 
 #### Argomenti
