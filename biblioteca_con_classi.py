@@ -1,21 +1,95 @@
+import csv
+from libro import Libro
+
 def carica_da_file(file_path):
     """Carica i libri dal file"""
-    # TODO
+    f = open(file_path, 'r')
+    righe = csv.reader(f)
+    for riga in righe:
+        # Qui ho una riga, intesa come sequenza di campi
+        if(len(riga) == 1):
+            # Sto leggendo la prima riga del file
+            numSezioni = int(riga[0]) # es. 5
+            # creo la struttura dati biblioteca
+            biblioteca = []
+            for s in range(0, numSezioni):
+                libri = [] # lista di libri della sezione
+                           # (inizialmente vuota x ogni sezione)
+                biblioteca.append(libri)
+        else:
+            # Sto leggendo le righe successive, ognuna nella forma
+            # titolo, autore, anno, numPagine, sezione
+            titolo = riga[0]
+            autore = riga[1]
+            anno = riga[2]
+            numPagine = riga[3]
+            sezione = riga[4]
+            # Oppure, equivalentemente
+            # titolo, autore, anno, numPagine, sezione = riga
+            libro = Libro(titolo.strip(), autore.strip(), int(anno), int(numPagine), int(sezione))
 
+            # Ora ho un libro, posso aggiungerlo ad una sezione
+            biblioteca[int(sezione)-1].append(libro)
+
+    f.close()
+    stampa_biblioteca(biblioteca)
+    return biblioteca
+
+
+def stampa_biblioteca(biblioteca):
+    for s in range(0, len(biblioteca)): # Per ogni indice di sezione
+        libri = biblioteca[s]   # Prendo la lista di libri di quella sezione
+        print(f"Sezione {s+1}:") # Stampo di che sezione si tratta
+        for libro in libri: # Poi scandisco i libri della sezione
+            print(libro) # Stampandoli (__str()__)
 
 def aggiungi_libro(biblioteca, titolo, autore, anno, pagine, sezione, file_path):
     """Aggiunge un libro nella biblioteca"""
-    # TODO
+    if sezione < 1 or sezione > len(biblioteca):
+        return None # Sezione non valida
+    if cerca_libro(biblioteca, titolo) is not None:
+        return None # Libro già presente
 
+    # Preparo il libro che vorrei inserire
+    libro = Libro(titolo, autore, anno, pagine, sezione)
+
+    # Prima di inserirlo nella struttura dati, provo
+    # ad aggiungero al file, se non riesco, non lo inserisco
+
+    try:
+        f = open(file_path, 'a')
+        csv.writer(f).writerow([libro.titolo, libro.autore, libro.anno, libro.numPagine, sezione])
+        # Dopo aver scritto su file, inserisco nella struttura dati
+        biblioteca[sezione-1].append(libro)
+    except FileExistsError:
+        return None
+
+    stampa_biblioteca(biblioteca)
+    return libro
 
 def cerca_libro(biblioteca, titolo):
     """Cerca un libro nella biblioteca dato il titolo"""
-    # TODO
-
+    for sezione in biblioteca: # sezione è una lista di libri
+        for libro in sezione:
+            if libro.titolo == titolo:
+                return libro.__str__() # Superfluo chiamare __str()__
 
 def elenco_libri_sezione_per_titolo(biblioteca, sezione):
     """Ordina i titoli di una data sezione della biblioteca in ordine alfabetico"""
-    # TODO
+
+    if sezione < 1 or sezione > len(biblioteca):
+        return None
+
+    # Estraggo una lista dei soli titoli dei libri in quella sezione
+    titoli = []
+    for libro in biblioteca[sezione-1]:
+        titoli.append(libro.titolo)
+
+    # Oppure, con una istruzione sola
+    titoli = [ libro.titolo for libro in biblioteca[sezione-1] ]
+
+    return sorted(titoli)
+
 
 
 def main():
