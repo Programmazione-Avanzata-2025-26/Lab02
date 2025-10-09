@@ -1,4 +1,4 @@
-# Lab 02
+# Lab 02 - Correzione in aula di Fabrizio Lamberti
 
 #### Argomenti
 
